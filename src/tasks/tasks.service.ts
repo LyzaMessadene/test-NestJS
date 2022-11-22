@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/auth/user.entity';
 import { Repository } from 'typeorm';
@@ -12,7 +13,13 @@ export class TasksService {
   constructor(
     @InjectRepository(Task)
     private tasksRepository: Repository<Task>,
-  ) {}
+
+    private configService: ConfigService,
+  ) {
+    const databaseName: string = this.configService.get<any>('DATABASE_HOST');
+    console.log('this.configService', this.configService);
+    console.log({ databaseName });
+  }
 
   public async getTasks(
     filter: GetTasksFilterDto,
