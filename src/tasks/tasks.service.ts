@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/auth/user.entity';
+import { User } from '../auth/user.entity';
 import { Repository } from 'typeorm';
 import { CreateTaskDto } from './dto/createTask.dto';
 import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
@@ -19,20 +19,23 @@ export class TasksService {
     filter: GetTasksFilterDto,
     user: User,
   ): Promise<Task[]> {
-    let tasks = await this.tasksRepository.findBy({ user: user });
-    if (!filter) return tasks;
+    // console.log('THIS.TASKSREPOSITORY', this.tasksRepository);
 
-    const { status, search } = filter;
-    if (status) {
-      tasks = tasks.filter((task) => task.status == status);
-    }
-    if (search) {
-      tasks = tasks.filter((task) => {
-        if (task.title.includes(search) || task.description.includes(search))
-          return true;
-        else return false;
-      });
-    }
+    const tasks = await this.tasksRepository.findBy({ user: user });
+
+    // if (!filter) return tasks;
+
+    // const { status, search } = filter;
+    // if (status) {
+    //   tasks = tasks.filter((task) => task.status == status);
+    // }
+    // if (search) {
+    //   tasks = tasks.filter((task) => {
+    //     if (task.title.includes(search) || task.description.includes(search))
+    //       return true;
+    //     else return false;
+    //   });
+    // }
     return tasks;
   }
 
@@ -49,6 +52,7 @@ export class TasksService {
   }
 
   async createTask(createTaskDto: CreateTaskDto, user: User) {
+    console.log('createTaskDto', createTaskDto);
     const { title, description } = createTaskDto;
 
     const createdTask = this.tasksRepository.create({
@@ -58,7 +62,10 @@ export class TasksService {
       user: user,
     });
 
-    await this.tasksRepository.save(createdTask);
+    console.log('createdTask', createdTask);
+
+    const result = await this.tasksRepository.save(createdTask);
+    console.log('RESULT: ', result);
 
     return createdTask;
   }
